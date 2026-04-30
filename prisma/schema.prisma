@@ -1,13 +1,45 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
+// Since Vercel is being used eventually, usually PostgreSQL is better.
+// But for development/initial step, SQLite might be used.
+// Let's use SQLite for local dev unless Vercel config was already set up.
+// Actually, earlier prompt said "SQLite (initial) or PostgreSQL (Vercel)".
+// Let's configure SQLite for now, we can easily change to PostgreSQL later.
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model Customer {
+  id             String        @id @default(cuid())
+  managementNo   String        @unique // 管理番号 (Management Number)
+  name           String        // お名前 (Name)
+  furigana       String?       // フリガナ (Furigana)
+  phone          String?       // 電話番号 (Phone)
+  email          String?       // メールアドレス (Email)
+  joinDate       DateTime      @default(now()) // 初回来店日 (Join Date)
+  membershipPlan String?       // 会員種別・プラン (Membership Plan)
+  initialGoals   String?       // 入会時の目標 (Initial Goals)
+  notes          String?       // 備考 (Notes)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  visitRecords   VisitRecord[]
+}
+
+model VisitRecord {
+  id               String   @id @default(cuid())
+  customerId       String
+  customer         Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  visitDateTime    DateTime @default(now()) // 来店日時 (Date & Time)
+  staff            String?  // 担当スタッフ (Staff)
+  trainingDetails  String?  // トレーニング内容 (Training Details)
+  bodyMetrics      String?  // 身体指標 (Body Metrics)
+  condition        String?  // 今回の状態・フィードバック (Condition / Feedback)
+  nextSteps        String?  // 次回への課題・申し送り (Next Steps)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
