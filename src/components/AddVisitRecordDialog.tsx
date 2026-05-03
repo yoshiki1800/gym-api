@@ -21,9 +21,13 @@ export function AddVisitRecordDialog({ customerId }: { customerId: string }) {
 
   async function onSubmit(formData: FormData) {
     setLoading(true);
-    await addVisitRecord(customerId, formData);
+    const result = await addVisitRecord(customerId, formData);
     setLoading(false);
-    setOpen(false);
+    if (result.success) {
+      setOpen(false);
+    } else {
+      alert(result.error || '記録の保存に失敗しました');
+    }
   }
 
   return (

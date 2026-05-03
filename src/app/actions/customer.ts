@@ -91,6 +91,7 @@ export async function createCustomer(formData: FormData) {
   const membershipPlan = formData.get('membershipPlan') as string;
   const initialGoals = formData.get('initialGoals') as string;
   const notes = formData.get('notes') as string;
+  const joinDateStr = formData.get('joinDate') as string;
 
   try {
     // Generate management number
@@ -118,6 +119,7 @@ export async function createCustomer(formData: FormData) {
         membershipPlan,
         initialGoals,
         notes,
+        ...(joinDateStr ? { joinDate: new Date(joinDateStr) } : {}),
       },
     });
     
@@ -156,5 +158,85 @@ export async function addVisitRecord(customerId: string, formData: FormData) {
   } catch (error) {
     console.error('Error adding visit record:', error);
     return { success: false, error: 'Failed to add visit record' };
+  }
+}
+
+// Update a customer
+export async function updateCustomer(id: string, formData: FormData) {
+  const name = formData.get('name') as string;
+  const furigana = formData.get('furigana') as string;
+  const phone = formData.get('phone') as string;
+  const email = formData.get('email') as string;
+  const membershipPlan = formData.get('membershipPlan') as string;
+  const initialGoals = formData.get('initialGoals') as string;
+  const notes = formData.get('notes') as string;
+  const joinDateStr = formData.get('joinDate') as string;
+
+  try {
+    const updatedCustomer = await prisma.customer.update({
+      where: { id },
+      data: {
+        name,
+        furigana,
+        phone,
+        email,
+        membershipPlan,
+        initialGoals,
+        notes,
+        ...(joinDateStr ? { joinDate: new Date(joinDateStr) } : {}),
+      },
+    });
+
+    revalidatePath(`/customers/${id}`);
+    revalidatePath('/');
+    return { success: true, customer: updatedCustomer };
+  } catch (error) {
+    console.error('Error updating customer:', error);
+    return { success: false, error: 'Failed to update customer' };
+  }
+}
+
+// Update a visit record
+export async function updateVisitRecord(id: string, customerId: string, formData: FormData) {
+  const staff = formData.get('staff') as string;
+  const trainingDetails = formData.get('trainingDetails') as string;
+  const bodyMetrics = formData.get('bodyMetrics') as string;
+  const condition = formData.get('condition') as string;
+  const nextSteps = formData.get('nextSteps') as string;
+  const visitDateTimeStr = formData.get('visitDateTime') as string;
+
+  try {
+    const updatedRecord = await prisma.visitRecord.update({
+      where: { id },
+      data: {
+        staff,
+        trainingDetails,
+        bodyMetrics,
+        condition,
+        nextSteps,
+        ...(visitDateTimeStr ? { visitDateTime: new Date(visitDateTimeStr) } : {}),
+      },
+    });
+
+    revalidatePath(`/customers/${customerId}`);
+    return { success: true, record: updatedRecord };
+  } catch (error) {
+    console.error('Error updating visit record:', error);
+    return { success: false, error: 'Failed to update visit record' };
+  }
+}
+
+// Delete a visit record
+export async function deleteVisitRecord(id: string, customerId: string) {
+  try {
+    await prisma.visitRecord.delete({
+      where: { id },
+    });
+
+    revalidatePath(`/customers/${customerId}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting visit record:', error);
+    return { success: false, error: 'Failed to delete visit record' };
   }
 }

@@ -22,9 +22,13 @@ export function AddCustomerDialog() {
 
   async function onSubmit(formData: FormData) {
     setLoading(true);
-    await createCustomer(formData);
+    const result = await createCustomer(formData);
     setLoading(false);
-    setOpen(false);
+    if (result.success) {
+      setOpen(false);
+    } else {
+      alert(result.error || '保存に失敗しました');
+    }
   }
 
   return (
@@ -55,6 +59,10 @@ export function AddCustomerDialog() {
           <div className="grid gap-2">
             <Label htmlFor="email">メールアドレス</Label>
             <Input id="email" name="email" type="email" placeholder="taro@example.com" />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="joinDate">初回来店日（入会日）</Label>
+            <Input id="joinDate" name="joinDate" type="date" defaultValue={new Date().toISOString().split('T')[0]} />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="membershipPlan">会員種別</Label>

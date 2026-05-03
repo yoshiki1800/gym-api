@@ -76,13 +76,16 @@ export default async function DashboardPage({ searchParams }: Props) {
                   </TableRow>
                 ) : (
                   customers.map((customer) => (
-                    <TableRow key={customer.id} className="cursor-pointer hover:bg-muted/50 transition-colors group relative">
-                      <TableCell className="font-medium text-muted-foreground">{customer.managementNo}</TableCell>
-                      <TableCell className="font-medium">
-                        <Link href={`/customers/${customer.id}`} className="absolute inset-0 z-10">
-                          <span className="sr-only">{customer.name}さんの詳細を見る</span>
+                    <TableRow key={customer.id} className="hover:bg-muted/50 transition-colors group">
+                      <TableCell className="font-medium text-muted-foreground">
+                        <Link href={`/customers/${customer.id}`} className="hover:underline">
+                          {customer.managementNo}
                         </Link>
-                        <span className="group-hover:text-primary transition-colors">{customer.name}</span>
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        <Link href={`/customers/${customer.id}`} className="hover:underline group-hover:text-primary transition-colors">
+                          {customer.name}
+                        </Link>
                       </TableCell>
                       <TableCell>{customer.furigana}</TableCell>
                       <TableCell>{(customer as any)._count?.visitRecords || 0}回</TableCell>

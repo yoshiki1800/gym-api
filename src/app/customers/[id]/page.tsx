@@ -1,5 +1,7 @@
 import { getCustomerById } from '@/app/actions/customer';
 import { AddVisitRecordDialog } from '@/components/AddVisitRecordDialog';
+import { EditCustomerDialog } from '@/components/EditCustomerDialog';
+import { EditVisitRecordDialog } from '@/components/EditVisitRecordDialog';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -36,8 +38,9 @@ export default async function CustomerDetailPage({
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card className="md:col-span-1">
-          <CardHeader className="pb-4">
+          <CardHeader className="pb-4 flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-lg">基本情報</CardTitle>
+            <EditCustomerDialog customer={customer} />
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <div>
@@ -91,9 +94,12 @@ export default async function CustomerDetailPage({
                         year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
                       })}
                     </span>
-                    {record.staff && (
-                      <span className="text-muted-foreground">担当: {record.staff}</span>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {record.staff && (
+                        <span className="text-muted-foreground mr-2">担当: {record.staff}</span>
+                      )}
+                      <EditVisitRecordDialog record={record} customerId={customer.id} />
+                    </div>
                   </div>
                   <CardContent className="p-4 grid gap-4 sm:grid-cols-2 text-sm">
                     {record.trainingDetails && (
