@@ -1,5 +1,6 @@
 import { getCustomers } from '@/app/actions/customer';
 import { AddCustomerDialog } from '@/components/AddCustomerDialog';
+import { ClickableCustomerRow } from '@/components/ClickableCustomerRow';
 import {
   Table,
   TableBody,
@@ -59,9 +60,9 @@ export default async function DashboardPage({ searchParams }: Props) {
                 <TableRow>
                   <TableHead className="min-w-[100px]">管理番号</TableHead>
                   <TableHead className="min-w-[150px]">お名前</TableHead>
-                  <TableHead className="min-w-[150px]">フリガナ</TableHead>
-                  <TableHead>来店回数</TableHead>
                   <TableHead>直近の来店日</TableHead>
+                  <TableHead>来店回数</TableHead>
+                  <TableHead className="min-w-[150px]">フリガナ</TableHead>
                   <TableHead>会員種別</TableHead>
                   <TableHead className="min-w-[150px]">電話番号</TableHead>
                   <TableHead>初回来店日</TableHead>
@@ -75,31 +76,8 @@ export default async function DashboardPage({ searchParams }: Props) {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  customers.map((customer) => (
-                    <TableRow key={customer.id} className="hover:bg-muted/50 transition-colors group">
-                      <TableCell className="font-medium text-muted-foreground">
-                        <Link href={`/customers/${customer.id}`} className="hover:underline">
-                          {customer.managementNo}
-                        </Link>
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        <Link href={`/customers/${customer.id}`} className="hover:underline group-hover:text-primary transition-colors">
-                          {customer.name}
-                        </Link>
-                      </TableCell>
-                      <TableCell>{customer.furigana}</TableCell>
-                      <TableCell>{(customer as any)._count?.visitRecords || 0}回</TableCell>
-                      <TableCell>
-                        {(customer as any).visitRecords?.[0]?.visitDateTime 
-                          ? new Date((customer as any).visitRecords[0].visitDateTime).toLocaleDateString('ja-JP') 
-                          : '-'}
-                      </TableCell>
-                      <TableCell>{customer.membershipPlan}</TableCell>
-                      <TableCell>{customer.phone}</TableCell>
-                      <TableCell>
-                        {new Date(customer.joinDate).toLocaleDateString('ja-JP')}
-                      </TableCell>
-                    </TableRow>
+                  customers.map((customer, index) => (
+                    <ClickableCustomerRow key={customer.id} customer={customer} index={index} />
                   ))
                 )}
               </TableBody>
